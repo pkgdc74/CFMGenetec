@@ -1,12 +1,12 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="TestService.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CFM.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="CFM_Token" Type="System.String" Scope="Application">
       <Value Profile="(Default)">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InByYXZlZW4uZ3VwdGFAdGVzdGZtLmNvbSIsImNpZCI6IkZNRGV2IiwiZXhwIjoxNzM1NzMyODAwLCJpcCI6Ijo6MSJ9.3KED8oQ-DaJwCIOHoAKIImb1aUFRths7t5i-Gdvge34</Value>
     </Setting>
     <Setting Name="CFM_EndPoint" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">http://localhost/fmdevelopment/workplaceready/common/rmiservice.asp</Value>
+      <Value Profile="(Default)">https://localhost/fmdevelopment/workplaceready/common/rmiservice.asp</Value>
     </Setting>
     <Setting Name="LogPath" Type="System.String" Scope="Application">
       <Value Profile="(Default)">c:\x\mylog.log</Value>
@@ -19,6 +19,15 @@
     </Setting>
     <Setting Name="GT_password" Type="System.String" Scope="Application">
       <Value Profile="(Default)">@Cadapult1</Value>
+    </Setting>
+    <Setting Name="GT_AuthType" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Digest</Value>
+    </Setting>
+    <Setting Name="GT_BadgeField" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">EmployeeId</Value>
+    </Setting>
+    <Setting Name="GT_BadgeFieldSource" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">CardHolderCustomField</Value>
     </Setting>
   </Settings>
 </SettingsFile>

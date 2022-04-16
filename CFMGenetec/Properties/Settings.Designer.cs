@@ -36,7 +36,7 @@ namespace CFM.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost/fmdevelopment/workplaceready/common/rmiservice.asp")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://localhost/fmdevelopment/workplaceready/common/rmiservice.asp")]
         public string CFM_EndPoint {
             get {
                 return ((string)(this["CFM_EndPoint"]));
@@ -76,6 +76,33 @@ namespace CFM.Properties {
         public string GT_password {
             get {
                 return ((string)(this["GT_password"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Digest")]
+        public string GT_AuthType {
+            get {
+                return ((string)(this["GT_AuthType"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("EmployeeId")]
+        public string GT_BadgeField {
+            get {
+                return ((string)(this["GT_BadgeField"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("CardHolderCustomField")]
+        public string GT_BadgeFieldSource {
+            get {
+                return ((string)(this["GT_BadgeFieldSource"]));
             }
         }
     }

@@ -61,11 +61,26 @@ namespace CFM
             {
                 case EventType.AccessGranted:
                     var tz = e.Event as SupportsTimeZoneEvent;
+                    string badgeField = null;
                     CardholderAccessRequestedEventArgs e2 = e as CardholderAccessRequestedEventArgs;
                     DateTime time = TimeZoneInfo.ConvertTimeFromUtc(e.Timestamp, tz.SourceTimeZone);
                     AccessPoint ap = engine.GetEntity(e2.AccessPointGuid) as AccessPoint;
                     Door door = engine.GetEntity(ap.Door) as Door;
-                    await CardAdmitted(e2.CardholderGuid.ToString(), time.ToString(), door.Name);
+                    Cardholder employee = engine.GetEntity(e2.CardholderGuid) as Cardholder;
+                    switch (settings.GT_BadgeFieldSource)
+                    {
+                        case "Credential":
+                            badgeField = e2.GetType().GetProperty(settings.GT_BadgeField).GetValue(e2).ToString();
+                            break;
+                        case "CardHolder":
+                            badgeField = employee.GetType().GetProperty(settings.GT_BadgeField).GetValue(employee).ToString();
+                            break;
+                        case "CardHolderCustomField":
+                            badgeField = employee.GetCustomFields().Where(x => x.CustomField.Name == settings.GT_BadgeField).FirstOrDefault().Value as string;
+                            break;
+
+                    }
+                    await CardAdmitted(badgeField, time.ToString(), door.Name);
                     //Task.Run(async () => await CardAdmitted(e2.CardholderGuid.ToString(), time.ToString(), door.Name));
                     break;
             }
@@ -73,7 +88,10 @@ namespace CFM
         protected override void OnStart(string[] args)
         {
             SubscribeEngine();
-            engine.LogOn(settings.GT_server, settings.GT_username, settings.GT_password);
+            if (settings.GT_AuthType == "Windows")
+                engine.LogOnUsingWindowsCredential(settings.GT_server);
+            if (settings.GT_AuthType == "Digest")
+                engine.LogOn(settings.GT_server, settings.GT_username, settings.GT_password);
         }
         protected override void OnStop()
         {
