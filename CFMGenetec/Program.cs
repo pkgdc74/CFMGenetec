@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SdkHelpers.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceProcess;
@@ -14,12 +15,14 @@ namespace CFM
         /// </summary>
         static void Main()
         {
+            SdkAssemblyLoader.Start();
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
                 new Service()
             };
             ServiceBase.Run(ServicesToRun);
+            SdkAssemblyLoader.Stop();
         }
     }
 }

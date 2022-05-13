@@ -2,6 +2,7 @@
 using Genetec.Sdk.Entities;
 using Genetec.Sdk.Events;
 using Genetec.Sdk.Queries;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using System;
@@ -23,6 +24,8 @@ namespace CFM
     {
         private Engine engine = new Engine();
         private Properties.Settings settings = Properties.Settings.Default;
+        private System.Timers.Timer doortimer = new System.Timers.Timer();
+        private Dictionary<string, string> doors = new Dictionary<string, string>();
         public Service()
         {
             InitializeComponent();
@@ -30,9 +33,12 @@ namespace CFM
             .MinimumLevel.Debug()
             .WriteTo.File(settings.LogPath, rollingInterval: RollingInterval.Day)
             .CreateLogger();
+            doortimer.Elapsed += async (e, a) => { await refreshDoorsData(); };
+            doortimer.Interval = 7200000;//2 hours
+            doortimer.Enabled = true;
         }
 
-        
+
         private void OnEngineLogonFailed(object sender, LogonFailedEventArgs e)
         {
             Log.Information(e.FormattedErrorMessage);
@@ -57,36 +63,52 @@ namespace CFM
         }
         private async void OnEngineEventReceived(object sender, EventReceivedEventArgs e)
         {
-            switch (e.EventType)
+            try
             {
-                case EventType.AccessGranted:
-                    var tz = e.Event as SupportsTimeZoneEvent;
-                    string badgeField = null;
-                    CardholderAccessRequestedEventArgs e2 = e as CardholderAccessRequestedEventArgs;
-                    DateTime time = TimeZoneInfo.ConvertTimeFromUtc(e.Timestamp, tz.SourceTimeZone);
-                    AccessPoint ap = engine.GetEntity(e2.AccessPointGuid) as AccessPoint;
-                    Door door = engine.GetEntity(ap.Door) as Door;
-                    Cardholder employee = engine.GetEntity(e2.CardholderGuid) as Cardholder;
-                    switch (settings.GT_BadgeFieldSource)
-                    {
-                        case "Credential":
-                            badgeField = e2.GetType().GetProperty(settings.GT_BadgeField).GetValue(e2).ToString();
-                            break;
-                        case "CardHolder":
-                            badgeField = employee.GetType().GetProperty(settings.GT_BadgeField).GetValue(employee).ToString();
-                            break;
-                        case "CardHolderCustomField":
-                            badgeField = employee.GetCustomFields().Where(x => x.CustomField.Name == settings.GT_BadgeField).FirstOrDefault().Value as string;
-                            break;
-
-                    }
-                    await CardAdmitted(badgeField, time.ToString(), door.Name);
-                    //Task.Run(async () => await CardAdmitted(e2.CardholderGuid.ToString(), time.ToString(), door.Name));
-                    break;
+                switch (e.EventType)
+                {
+                    case EventType.AccessGranted:
+                        var tz = e.Event as SupportsTimeZoneEvent;
+                        string badgeField = null;
+                        CardholderAccessRequestedEventArgs e2 = e as CardholderAccessRequestedEventArgs;
+                        DateTime time = TimeZoneInfo.ConvertTimeFromUtc(e.Timestamp, tz.SourceTimeZone);
+                        AccessPoint ap = engine.GetEntity(e2.AccessPointGuid) as AccessPoint;
+                        var door = engine.GetEntity(ap.Door) as Genetec.Sdk.Entities.Door;
+                        Cardholder employee = engine.GetEntity(e2.CardholderGuid) as Cardholder;
+                        if (null == employee) return;
+                        switch (settings.GT_BadgeFieldSource)
+                        {
+                            case "Credential":
+                                Log.Information("Event recieved: Credential");
+                                badgeField = e2.GetType().GetProperty(settings.GT_BadgeField).GetValue(e2).ToString();
+                                break;
+                            case "CardHolder":
+                                Log.Information("Event recieved: CardHolder");
+                                badgeField = employee.GetType().GetProperty(settings.GT_BadgeField).GetValue(employee).ToString();
+                                break;
+                            case "CardHolderCustomField":
+                                Log.Information("Event recieved: CardHolderCustomField");
+                                badgeField = employee.GetCustomFields().Where(x => x.CustomField.Name == settings.GT_BadgeField).FirstOrDefault().Value as string;
+                                break;
+                            default:
+                                return;
+                        }
+                        Log.Information($"Calling CardAdmitted {badgeField},{time.ToString()}, {door.Name}");
+                        await CardAdmitted(badgeField, time.ToString(), door.Name);
+                        //Task.Run(async () => await CardAdmitted(e2.CardholderGuid.ToString(), time.ToString(), door.Name));
+                        break;
+                }
             }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
         }
-        protected override void OnStart(string[] args)
+        protected override async void OnStart(string[] args)
         {
+            Log.Information("On Start called");
+            await refreshDoorsData();
             SubscribeEngine();
             if (settings.GT_AuthType == "Windows")
                 engine.LogOnUsingWindowsCredential(settings.GT_server);
@@ -113,7 +135,7 @@ namespace CFM
             engine.LogonFailed += OnEngineLogonFailed;
             engine.LogonStatusChanged += OnEngineLogonStatusChanged;
             engine.EventReceived += OnEngineEventReceived;
-            
+
         }
         private void UnsubscribeEngine()
         {
@@ -128,6 +150,11 @@ namespace CFM
         {
             try
             {
+                if (!doors.ContainsKey(door.ToLower()))
+                {
+                    Log.Information($"CardAdmitted: {door} not found");
+                    return;
+                }
                 HttpClient client = new HttpClient();
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {settings.CFM_Token}");
                 var values = new Dictionary<string, string>{
@@ -145,10 +172,46 @@ namespace CFM
                 JObject res = JObject.Parse(await response.Content.ReadAsStringAsync());
                 Log.Information("CadapultFM response: " + (string)res["msg"]);
             }
-            catch (HttpRequestException ex)
+            catch (Exception ex)
             {
-                Log.Information("Request Error: "+ex.Message);
+                Log.Error(ex,"");
             }
         }
+        public async Task refreshDoorsData()
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {settings.CFM_Token}");
+                var values = new Dictionary<string, string>{
+                    { "class", "cfm.wr.BadgingService" },
+                    { "method", "getAllBadgeDoorsWithLocation" }
+                };
+                var response = await client.PostAsync(settings.CFM_EndPoint, new FormUrlEncodedContent(values));
+                
+                if (false == response.IsSuccessStatusCode)
+                {
+                    Log.Error(await response.Content.ReadAsStringAsync());
+                }
+                var res = await response.Content.ReadAsStringAsync();
+                doors = JsonConvert.DeserializeObject<List<Door>>(res).Aggregate(new Dictionary<string, string>(), (t, n) =>
+                {
+                    n.doorid = n.doorid.ToLower();
+                    if(!t.ContainsKey(n.doorid))
+                        t.Add(n.doorid, n.timezone);
+                    return t;
+                });
+                Log.Information("Door data refreshed");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex,"");
+            }
+        }
+    }
+    class Door
+    {
+        public string doorid;
+        public string timezone;
     }
 }

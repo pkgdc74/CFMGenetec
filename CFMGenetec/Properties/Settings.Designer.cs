@@ -36,15 +36,6 @@ namespace CFM.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://localhost/fmdevelopment/workplaceready/common/rmiservice.asp")]
-        public string CFM_EndPoint {
-            get {
-                return ((string)(this["CFM_EndPoint"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("c:\\x\\mylog.log")]
         public string LogPath {
             get {
@@ -90,7 +81,16 @@ namespace CFM.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("EmployeeId")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost/fmdevelopment/workplaceready/common/rmiservice.asp")]
+        public string CFM_EndPoint {
+            get {
+                return ((string)(this["CFM_EndPoint"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("EmailAddress")]
         public string GT_BadgeField {
             get {
                 return ((string)(this["GT_BadgeField"]));
@@ -99,7 +99,7 @@ namespace CFM.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("CardHolderCustomField")]
+        [global::System.Configuration.DefaultSettingValueAttribute("CardHolder")]
         public string GT_BadgeFieldSource {
             get {
                 return ((string)(this["GT_BadgeFieldSource"]));

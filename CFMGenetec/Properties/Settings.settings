@@ -5,9 +5,6 @@
     <Setting Name="CFM_Token" Type="System.String" Scope="Application">
       <Value Profile="(Default)">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InByYXZlZW4uZ3VwdGFAdGVzdGZtLmNvbSIsImNpZCI6IkZNRGV2IiwiZXhwIjoxNzM1NzMyODAwLCJpcCI6Ijo6MSJ9.3KED8oQ-DaJwCIOHoAKIImb1aUFRths7t5i-Gdvge34</Value>
     </Setting>
-    <Setting Name="CFM_EndPoint" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">https://localhost/fmdevelopment/workplaceready/common/rmiservice.asp</Value>
-    </Setting>
     <Setting Name="LogPath" Type="System.String" Scope="Application">
       <Value Profile="(Default)">c:\x\mylog.log</Value>
     </Setting>
@@ -23,11 +20,14 @@
     <Setting Name="GT_AuthType" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Digest</Value>
     </Setting>
+    <Setting Name="CFM_EndPoint" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://localhost/fmdevelopment/workplaceready/common/rmiservice.asp</Value>
+    </Setting>
     <Setting Name="GT_BadgeField" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">EmployeeId</Value>
+      <Value Profile="(Default)">EmailAddress</Value>
     </Setting>
     <Setting Name="GT_BadgeFieldSource" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">CardHolderCustomField</Value>
+      <Value Profile="(Default)">CardHolder</Value>
     </Setting>
   </Settings>
 </SettingsFile>
