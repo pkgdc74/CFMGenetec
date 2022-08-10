@@ -105,5 +105,14 @@ namespace CFM.Properties {
                 return ((string)(this["GT_BadgeFieldSource"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost/fmdevelopment/workplaceready/common/adminrmi.asp")]
+        public string CFM_AdminEndPoint {
+            get {
+                return ((string)(this["CFM_AdminEndPoint"]));
+            }
+        }
     }
 }

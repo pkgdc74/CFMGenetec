@@ -29,5 +29,8 @@
     <Setting Name="GT_BadgeFieldSource" Type="System.String" Scope="Application">
       <Value Profile="(Default)">CardHolder</Value>
     </Setting>
+    <Setting Name="CFM_AdminEndPoint" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://localhost/fmdevelopment/workplaceready/common/adminrmi.asp</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

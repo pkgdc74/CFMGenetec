@@ -184,10 +184,10 @@ namespace CFM
                 HttpClient client = new HttpClient();
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {settings.CFM_Token}");
                 var values = new Dictionary<string, string>{
-                    { "class", "cfm.wr.BadgingService" },
+                    { "class", "cfm.wr.AdminService" },
                     { "method", "getAllBadgeDoorsWithLocation" }
                 };
-                var response = await client.PostAsync(settings.CFM_EndPoint, new FormUrlEncodedContent(values));
+                var response = await client.PostAsync(settings.CFM_AdminEndPoint, new FormUrlEncodedContent(values));
                 
                 if (false == response.IsSuccessStatusCode)
                 {
